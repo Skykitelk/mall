@@ -1,0 +1,15 @@
+Django==1.11.3
+#django-filter==1.0.4
+djangorestframework==3.6.3
+djangorestframework-jwt==1.11.0
+MySQL-python==1.2.5
+pycrypto==2.6.1
+requests==2.18.3
+coreapi==2.3.1
+Pillow==4.0.0
+gunicorn==19.7.1
+
+
+
+
+
