@@ -85,8 +85,41 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('name',)
     filter_horizontal = ()
 
+
+
+class AddressAdmin(admin.ModelAdmin):
+    list_display = ('id','user','name','tel','address')
+
+class GoodsAdmin(admin.ModelAdmin):
+    list_display = ('id','name','price','remark')
+
+class ClassifyAdmin(admin.ModelAdmin):
+    list_display = ('id','name','remark')
+
+class GoodsImageAdmin(admin.ModelAdmin):
+    list_display = ('id','goods','image')
+
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ('id','user','goods','count')
+
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id','user','number','state','price','recipientName')
+
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ('id','order','goods','goods_count','goods_name','goods_price','goods_amount')
+
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('id','order','post_company','post_number')
 # Now register the new UserAdmin...
 admin.site.register(MyUser, UserAdmin)
+admin.site.register(Address, AddressAdmin)
+admin.site.register(Goods, GoodsAdmin)
+admin.site.register(GoodsImage, GoodsImageAdmin)
+admin.site.register(CartItem, CartItemAdmin)
+admin.site.register(OrderItem, OrderItemAdmin)
+admin.site.register(Order, OrderAdmin)
+admin.site.register(Post, PostAdmin)
+admin.site.register(Classify, ClassifyAdmin)
 # ... and, since we're not using Django's built-in permissions,
 # unregister the Group model from admin.
 admin.site.unregister(Group)

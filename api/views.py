@@ -24,6 +24,39 @@ from rest_framework_jwt import authentication
 import requests
 import json
 
+APPID="wx795aca6b87c89ab9"
+APPSECRET="20b2e04c53b7b7417976c926dda8a27d"
+
+
+# code换取openId登录
+@api_view(['POST'])
+def login(request,format=None):
+	code=request.data['code']
+	print code
+	#code -> openid
+	keyURL= 'https://api.weixin.qq.com/sns/jscode2session?appid='+APPID+'&secret='+APPSECRET+'&js_code='+code+'&grant_type=authorization_code'
+	r = requests.post(keyURL).json()
+	print "r:",r
+
+	openId= r['openid']	
+	user = MyUser.objects.filter(openId=openId)
+	if user:
+		pass
+	else:
+		userSerializer=UserSerializer()
+		data={
+				"openId":openId,
+			}
+		userSerializer.create(data)
+
+	user = MyUser.objects.get(openId=openId)
+	serializer = UserSerializer(user,context={'request': request})
+	print type(serializer.data)
+	return Response(serializer.data)
+
+
+## list／create／retrieve／update／partial_update／destroy
+
 class UserViewSet(viewsets.ModelViewSet):
 	"""
 	create: AllowAny,新建用户通过openId和用户名即可，测试OK
@@ -39,6 +72,7 @@ class UserViewSet(viewsets.ModelViewSet):
 	# permission 管理
 	permission_classes=[IsAuthenticated, ]
 	permissionByAction = {'create':[AllowAny,],
+					#'partial_update':[AllowAny,],
 						}
 	def get_permissions(self):
 		try:
@@ -48,20 +82,20 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class AddressViewSet(viewsets.ModelViewSet):
 	"""
-	create: AllowAny
+	create: IsAuthenticated
 	read: IsAuthenticated
 	partial_update:IsAuthenticated
-	delete: IsAdminUser
-	list: IsAdminUser
-	update: IsAdminUser
+	delete: IsAuthenticated
+	list: IsAuthenticated
+	update: IsAuthenticated
+	本身应该是IsOnwer
 	"""
 	queryset = Address.objects.all()
 	serializer_class = AddressSerializer
 
 	# permission 管理
 	permission_classes=[IsAuthenticated, ]
-	permissionByAction = {'create':[AllowAny,],
-						}
+	permissionByAction = {}
 	def get_permissions(self):
 		try:
 			return [permission() for permission in self.permissionByAction[self.action]]
@@ -70,20 +104,21 @@ class AddressViewSet(viewsets.ModelViewSet):
 
 class ClassifyViewSet(viewsets.ModelViewSet):
 	"""
-	create: AllowAny
-	read: IsAuthenticated
-	partial_update:IsAuthenticated
+	create: IsAdminUser
+	read: AllowAny
+	partial_update:IsAdminUser
 	delete: IsAdminUser
-	list: IsAdminUser
+	list: AllowAny
 	update: IsAdminUser
 	"""
 	queryset = Classify.objects.all()
 	serializer_class = ClassifySerializer
 
 	# permission 管理
-	permission_classes=[IsAuthenticated, ]
-	permissionByAction = {'create':[AllowAny,],
-						}
+	permission_classes=[IsAdminUser, ]
+	permissionByAction = {'read':[AllowAny,],
+							'list':[AllowAny,],
+							}
 	def get_permissions(self):
 		try:
 			return [permission() for permission in self.permissionByAction[self.action]]
@@ -93,19 +128,20 @@ class ClassifyViewSet(viewsets.ModelViewSet):
 
 class GoodsViewSet(viewsets.ModelViewSet):
 	"""
-	create: AllowAny
-	read: IsAuthenticated
-	partial_update:IsAuthenticated
+	create: IsAdminUser
+	read: AllowAny
+	partial_update:IsAdminUser
 	delete: IsAdminUser
-	list: IsAdminUser
+	list: AllowAny
 	update: IsAdminUser
 	"""
 	queryset = Goods.objects.all()
 	serializer_class = GoodsSerializer
 
 	# permission 管理
-	permission_classes=[IsAuthenticated, ]
-	permissionByAction = {'create':[AllowAny,],
+	permission_classes=[IsAdminUser, ]
+	permissionByAction = {'retrieve':[AllowAny,],
+						'list':[AllowAny,],
 						}
 	def get_permissions(self):
 		try:
@@ -115,19 +151,20 @@ class GoodsViewSet(viewsets.ModelViewSet):
 
 class GoodsImageViewSet(viewsets.ModelViewSet):
 	"""
-	create: AllowAny
-	read: IsAuthenticated
-	partial_update:IsAuthenticated
+	create: IsAdminUser
+	read: AllowAny
+	partial_update:IsAdminUser
 	delete: IsAdminUser
-	list: IsAdminUser
+	list: AllowAny
 	update: IsAdminUser
 	"""
 	queryset = GoodsImage.objects.all()
 	serializer_class = GoodsImageSerializer
 
 	# permission 管理
-	permission_classes=[IsAuthenticated, ]
-	permissionByAction = {'create':[AllowAny,],
+	permission_classes=[IsAdminUser, ]
+	permissionByAction = {'retrieve':[AllowAny,],
+							'list':[AllowAny,],
 						}
 	def get_permissions(self):
 		try:
@@ -138,25 +175,26 @@ class GoodsImageViewSet(viewsets.ModelViewSet):
 
 class CartItemViewSet(viewsets.ModelViewSet):
 	"""
-	create: AllowAny
+	create: IsAuthenticated
 	read: IsAuthenticated
 	partial_update:IsAuthenticated
-	delete: IsAdminUser
+	delete: IsAuthenticated
 	list: IsAdminUser
-	update: IsAdminUser
+	update: IsAuthenticated
 	"""
 	queryset = CartItem.objects.all()
 	serializer_class = CartItemSerializer
 
 	# permission 管理
 	permission_classes=[IsAuthenticated, ]
-	permissionByAction = {'create':[AllowAny,],
+	permissionByAction = {'list':[IsAdminUser,],
 						}
 	def get_permissions(self):
 		try:
 			return [permission() for permission in self.permissionByAction[self.action]]
 		except KeyError: 
 			return [permission() for permission in self.permission_classes]
+
 
 class OrderViewSet(viewsets.ModelViewSet):
 	"""
