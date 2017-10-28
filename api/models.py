@@ -24,7 +24,6 @@ class MyUserManager(BaseUserManager):
 			name=name,
 		)
 		user.set_password("1234pttk")
-		print "password"
 		user.save(using=self._db)
 		return user
 
@@ -111,7 +110,6 @@ class Goods(models.Model):
 	name=models.CharField(max_length=200,blank=True)
 	mainImage=models.ImageField(upload_to='image',null=True)
 	price=models.FloatField(default=0.00)
-	remark=models.CharField(max_length=500,null=True)
 	create_at = models.DateTimeField(auto_now_add=True)
 	update_at = models.DateTimeField(auto_now=True)
 
@@ -121,6 +119,16 @@ class Goods(models.Model):
 
 	def __unicode__(self):
 		return '%s'%(self.name)
+
+# 滚动广告
+class Swiper(models.Model):
+	title=models.CharField(max_length=200,blank=True)
+	goods=models.ForeignKey(Goods,related_name="swiper")
+	image=models.ImageField(upload_to='swiper')
+	create_at = models.DateTimeField(auto_now_add=True)
+	update_at = models.DateTimeField(auto_now=True)
+	def __unicode__(self):
+		return '%s'%(self.title)
 
 
 # 产品类别
@@ -160,9 +168,16 @@ class CartItem(models.Model):
 
 # 订单信息 部分信息需要静态保存如收货人信息，商品信息
 class Order(models.Model):
-	number=models.CharField(max_length=30)
+	orderState=(
+         (1, u'待付款'),
+         (2, u'待发货'),
+         (3, u'待收货'),
+         (4, u'已收货'),
+         (5, u'售后'),
+    )
+	number=models.CharField(max_length=32,unique=True)
 	user=models.ForeignKey(MyUser,related_name="order_user")
-	state = models.PositiveSmallIntegerField(default=0)
+	state = models.PositiveSmallIntegerField(choices=orderState,verbose_name='订单状态',default=1)
 	price = models.FloatField(default=0.00)
 	recipientName=models.CharField(max_length=20)
 	recipientTel=models.CharField(max_length=12,blank=True)
@@ -174,12 +189,11 @@ class Order(models.Model):
 		return '%s'%(self.number)
 
 class OrderItem(models.Model):
-	order=models.ForeignKey(Order,related_name="order")
+	order=models.ForeignKey(Order,related_name="order_item")
 	goods=models.ForeignKey(Goods,related_name="order_goods")
 	goods_count = models.IntegerField(verbose_name=u"商品数量", blank=True, null=True)
 	goods_name = models.CharField(verbose_name="商品名称", blank=True, max_length=100)
 	goods_price = models.FloatField(verbose_name=u"商品单价", default=0.0)
-	goods_amount = models.FloatField(verbose_name=u"商品总价", default=0.0)
 	def __unicode__(self):
 		return '%s'%(self.goods_name)
 

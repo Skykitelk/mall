@@ -21,7 +21,7 @@ class UserCreationForm(forms.ModelForm):
 
     class Meta:
         model = MyUser
-        fields = ('openId', 'name')
+        fields = ('openId','name')
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -91,10 +91,13 @@ class AddressAdmin(admin.ModelAdmin):
     list_display = ('id','user','name','tel','address')
 
 class GoodsAdmin(admin.ModelAdmin):
-    list_display = ('id','name','price','remark')
+    list_display = ('id','name','price')
+
+class SwiperAdmin(admin.ModelAdmin):
+    list_display = ('id','title','image','goods')
 
 class ClassifyAdmin(admin.ModelAdmin):
-    list_display = ('id','name','remark')
+    list_display = ('id','name')
 
 class GoodsImageAdmin(admin.ModelAdmin):
     list_display = ('id','goods','image')
@@ -106,7 +109,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ('id','user','number','state','price','recipientName')
 
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ('id','order','goods','goods_count','goods_name','goods_price','goods_amount')
+    list_display = ('id','order','goods','goods_count','goods_name','goods_price')
 
 class PostAdmin(admin.ModelAdmin):
     list_display = ('id','order','post_company','post_number')
@@ -114,6 +117,7 @@ class PostAdmin(admin.ModelAdmin):
 admin.site.register(MyUser, UserAdmin)
 admin.site.register(Address, AddressAdmin)
 admin.site.register(Goods, GoodsAdmin)
+admin.site.register(Swiper, SwiperAdmin)
 admin.site.register(GoodsImage, GoodsImageAdmin)
 admin.site.register(CartItem, CartItemAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)

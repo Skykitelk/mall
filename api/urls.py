@@ -20,13 +20,15 @@ router.register(r'cartitem', views.CartItemViewSet)
 router.register(r'order', views.OrderViewSet)
 router.register(r'orderitem', views.OrderItemViewSet)
 router.register(r'post', views.PostViewSet)
-
+router.register(r'swiper', views.SwiperViewSet)
 
 urlpatterns = [
 	url(r'^', include(router.urls)),
     url(r'^docs/', include_docs_urls(title='Workers API')),
     url(r'^token/', obtain_jwt_token),
     url(r'^login/',views.login),
+    url(r'^unifiedorder/',views.unifiedorder),
+    url(r'^myorder/',views.myOrder),
     #url(r'^workers/?(?P<pk>\d+)/$',views.workers),
     #url(r'^invitations/?(?P<pk>\d+)/$',views.invitation),
     #url(r'^avatar/',views.updateAvatar),

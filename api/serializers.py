@@ -16,11 +16,17 @@ class GoodsImageSerializer(serializers.HyperlinkedModelSerializer):
 		model = GoodsImage
 		fields = ('url','id','goods','image')
 
+
 class GoodsSerializer(serializers.HyperlinkedModelSerializer):
 	image=GoodsImageSerializer(many=True,read_only=True)
 	class Meta:
 		model = Goods
-		fields = ('url','id','types','name','mainImage','price','remark','image')
+		fields = ('url','id','types','name','mainImage','price','image')
+
+class SwiperSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = Swiper
+		fields = ('url','id','title','goods','image')
 
 class AddressSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
@@ -52,28 +58,29 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 		return user
 
 
-
-
-
-
 class OrderSerializer(serializers.HyperlinkedModelSerializer):
-	user=serializers.HyperlinkedRelatedField(read_only=True,view_name='order_user')
 	class Meta:
 		model = Order
 		fields = ('url','id','number','user','state','price','recipientName','recipientTel','recipientAddress','create_at')
 
 class OrderItemSerializer(serializers.HyperlinkedModelSerializer):
-	order=serializers.HyperlinkedRelatedField(read_only=True,view_name='order')
-	goods=serializers.HyperlinkedRelatedField(read_only=True,view_name='order_goods')
+	goods_detail = GoodsSerializer(source='goods', read_only=True)
 	class Meta:
 		model = OrderItem
-		fields = ('url','id','goods','order','goods_count','goods_name','goods_price','goods_amount')
+		fields = ('url','id','goods','order','goods_count','goods_name','goods_price','goods_detail')
+
 
 class PostSerializer(serializers.HyperlinkedModelSerializer):
-	order=serializers.HyperlinkedRelatedField(read_only=True,view_name='post_order')
 	class Meta:
 		model = Post
 		fields = ('url','id','order','post_company','post_number')				
+
+class MyOrderSerializer(serializers.HyperlinkedModelSerializer):
+	order_item=OrderItemSerializer(many=True,read_only=True)
+	class Meta:
+		model = Order
+		fields = ('url','id','number','user','state','price','recipientName','recipientTel','recipientAddress','create_at','order_item','post_order')
+
 
 
 		
